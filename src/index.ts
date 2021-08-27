@@ -1,26 +1,14 @@
-import routes from "./routes";
-import express, { json, urlencoded } from "express";
-import pug from "pug";
+import chalk from "chalk";
+import server from "./server";
 
-const PORT = 3000;
-const app = express();
+const HOSTNAME = "0.0.0.0";
+const port: number = Number.parseInt(process.env.PORT ?? "1000", 10);
 
-// initialize
-app.set("view engine", "pug");
-app.set("views", "./public/views");
-app.engine("pug", (pug as any).__express);
-
-app.use(json());
-app.use(urlencoded({ extended: true }));
-app.use("/", express.static(`${process.cwd()}/public`));
-
-// use routes
-app.use("/api", routes.api);
-
-app.get("/", (_, res) => {
-	res.render("index");
-});
-
-app.listen(PORT, () => {
-	console.log("http://localhost:3000");
+server.listen(port, HOSTNAME, () => {
+	console.log(
+		chalk.green(
+			`⚡[server]: listening on`,
+			chalk.magenta(`http://localhost:${port}`)
+		)
+	);
 });
