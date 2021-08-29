@@ -1,16 +1,27 @@
 import chalk from "chalk";
 import server from "./server";
 import internalIp from "internal-ip";
+import boxen from "boxen";
 
 const HOSTNAME = "0.0.0.0";
 const port: number = Number.parseInt(process.env.PORT ?? "1000", 10);
 
 server.listen(port, HOSTNAME, async () => {
 	console.log(
-		chalk.green(
-			`⚡[server]: listening on`,
-			chalk.magenta(`http://localhost:${port}`),
-			await internalIp.v4()
+		boxen(
+			chalk.green(
+				"⚡ [server] is run!",
+				"\n\nYou can access it with these addresses:",
+				chalk.underline("\n\nLocal address:"),
+				chalk.magenta(`http://localhost:${port}/`),
+				chalk.underline("\nRemote address:"),
+				chalk.magenta(`http://${await internalIp.v4()}:${port}/`)
+			),
+			{
+				padding: 1,
+				margin: { top: 1, right: 0, bottom: 0, left: 4 },
+				borderStyle: <any>"round",
+			}
 		)
 	);
 });
