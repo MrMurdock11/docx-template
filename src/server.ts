@@ -12,6 +12,8 @@ import { DebtorDto } from "./models/debtor.dto";
 import moment from "moment";
 import { CourtOfLawDto } from "./models/court-of-law.dto";
 import { incline } from "lvovich";
+import { DeclentionStrT } from "lvovich/lib/inclineRules";
+import { join, split } from "lodash";
 
 const app = express();
 
@@ -23,58 +25,92 @@ app.get("/", (_, res) => {
 	res.send("Осман ЛОХ!");
 });
 
+const inclineFullName = (
+	fullName: string,
+	declention: DeclentionStrT | undefined
+): string => {
+	const [last, first, middle] = split(fullName, " ");
+
+	const inclineFullName = incline({ last, first, middle }, declention);
+
+	return `${inclineFullName.last} ${inclineFullName.first} ${inclineFullName.middle}`;
+};
+
 app.post("/generate", (req, res) => {
-	const templatePath = path.join(
+	const templatePathForRequestPayment = path.join(
 		process.cwd(),
 		"/templates/request_payment.docx"
 	);
-	const zip = new PizZip(readFileSync(templatePath, "binary"));
-	const doc = new DocxTemplater(zip);
-
-	const { first, middle, last } = incline(
-		{ first: "Осман", middle: "Артурович", last: "Мамбетов" },
-		"genitive"
+	const templatePathForRequestCompleteProcedure = path.join(
+		process.cwd(),
+		"/templates/request_complete-procedure.docx"
 	);
 
-	doc.setData({
-		id: "А40-20515/2020",
-		date: "24.08.2020",
-		financialManager: {
-			fullName: "Мамбетов Осман Артурович",
-			fullNameGenitive: `${last} ${first} ${middle}`,
-			initials: "Мамбетов О.А.",
-			address: "г. Москва, ул. Сходненская 14",
-			phone: "8-977-303-50-91",
-			email: "osman322@gmail.com",
-		} as FinancialManagerDto,
-		debtor: {
-			fullName: "Фокина Евгения Алексеевна",
-			fullNameGenitive: "Фокиной Евгении Алексеевой",
-			fullNameInstrumental: "Фокиной Евгенией Алексеевной",
-			personalInsurancePolicyNumber: "123123123123123123", // СНИЛС
-			individualTaxpayerNumber: "123123123123123", // ИНН
-			birthday: "7 мая 1995",
-			placeOfBirth: "г. Коломна, ул. Ленина 17 к. 1",
-			registrationAddress: "г. Коломна, ул. Ленина 17 к. 1",
-		} as DebtorDto,
-		currentDate: moment().format("DD.MM.YYYY"),
-		courtOfLaw: {
-			title: "Арбитражный суд города Москвы",
-			address: "г. Москва, ул. Тверская 12",
-		} as CourtOfLawDto,
-	});
+	for (let i = 0; i < 2; i++) {
+		const zip = new PizZip(
+			readFileSync(
+				i == 0
+					? templatePathForRequestPayment
+					: templatePathForRequestCompleteProcedure,
+				"binary"
+			)
+		);
+		const doc = new DocxTemplater(zip);
 
-	doc.render();
+		doc.setData({
+			id: "А40-20515/2020",
+			date: "24.08.2020",
+			financialManager: {
+				fullName: "Астахов Сергей Михайлович",
+				fullNameGenitive: inclineFullName(
+					"Астахов Сергей Михайлович",
+					"genitive"
+				),
+				initials: "Мамбетов О.А.",
+				address: "г. Москва, ул. Пушкина 99",
+				phone: "8-966-323-12-01",
+				email: "Ryley_Mayert@example.org",
+			} as FinancialManagerDto,
+			debtor: {
+				fullName: "Иванов Петр Петрович",
+				fullNameGenitive: inclineFullName("Иванов Петр Петрович", "genitive"),
+				fullNameInstrumental: inclineFullName(
+					"Иванов Петр Петрович",
+					"instrumental"
+				),
+				personalInsurancePolicyNumber: "112-233-125 99", // СНИЛС
+				individualTaxpayerNumber: "240852222455", // ИНН
+				birthday: "7 мая 1995",
+				placeOfBirth: "г. Москва, ул. Ленина 17 к. 1",
+				registrationAddress: "г. Москва, ул. Ленина 17 к. 1",
+			} as DebtorDto,
+			currentDate: moment().format("DD.MM.YYYY"),
+			courtOfLaw: {
+				title: "Арбитражного суда г. Москвы",
+				address: "г. Москва, ул. Тверская 12",
+			} as CourtOfLawDto,
+		});
 
-	const buffer = doc.getZip().generate({ type: "nodebuffer" });
+		doc.render();
 
-	const outputDirectory = path.join(process.cwd(), "output");
+		const buffer = doc.getZip().generate({ type: "nodebuffer" });
 
-	if (!existsSync(outputDirectory)) {
-		mkdirSync(path.join(process.cwd(), "output"));
+		const outputDirectory = path.join(process.cwd(), "output");
+
+		if (!existsSync(outputDirectory)) {
+			mkdirSync(path.join(process.cwd(), "output"));
+		}
+
+		writeFileSync(
+			path.join(
+				process.cwd(),
+				i == 0
+					? "output/request_payment.docx"
+					: "output/request_complete-procedure.docx"
+			),
+			buffer
+		);
 	}
-
-	writeFileSync(path.join(process.cwd(), "output/my.document.docx"), buffer);
 
 	res.status(200).send();
 });
