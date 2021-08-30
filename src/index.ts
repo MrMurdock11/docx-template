@@ -12,9 +12,9 @@ server.listen(port, HOSTNAME, async () => {
 			chalk.green(
 				"⚡ [server] is run!",
 				"\n\nYou can access it with these addresses:",
-				chalk.underline("\n\nLocal address:"),
+				chalk.underline("\n\nLocal:"),
 				chalk.magenta(`http://localhost:${port}/`),
-				chalk.underline("\nRemote address:"),
+				chalk.underline("\nOn your network:"),
 				chalk.magenta(`http://${await internalIp.v4()}:${port}/`)
 			),
 			{
