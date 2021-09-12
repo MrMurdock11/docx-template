@@ -17,9 +17,22 @@ const app = express();
 app.use(cors());
 app.use(urlencoded({ extended: false }));
 app.use(json());
+app.use(express.static("public"));
+
+app.use((req, res, next) => {
+	const isApiRequest = new RegExp("/api/", "gm").test(req.url);
+
+	if (!isApiRequest) {
+		res.redirect("/");
+
+		return void 0;
+	}
+
+	next();
+});
 
 app.get("/", (_, res) => {
-	res.send("Home page!");
+	res.sendFile(path.join(process.cwd(), "public/index.html"));
 });
 
 const inclineFullName = (
@@ -33,7 +46,11 @@ const inclineFullName = (
 	return `${inclineFullName.last} ${inclineFullName.first} ${inclineFullName.middle}`;
 };
 
-app.post("/generate", (req, res) => {
+app.get("/api/test", (_, res) => {
+	res.send("Hello world!");
+});
+
+app.post("/api/generate", (req, res) => {
 	const templatePathForRequestPayment = path.join(
 		process.cwd(),
 		"/templates/request_payment.docx"

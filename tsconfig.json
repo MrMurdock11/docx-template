@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es5",
+		"target": "ES6",
 		"module": "CommonJS",
 		"moduleResolution": "node",
 		"sourceMap": true,
@@ -11,6 +11,11 @@
 		"removeComments": true,
 		"resolveJsonModule": true,
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "**/*.spec.ts"]
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts"
+	]
 }
