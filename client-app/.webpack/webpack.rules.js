@@ -11,6 +11,10 @@ module.exports = [
 		use: ["style-loader", "css-loader"],
 	},
 	{
+		test: /semantic.min.css$/,
+		use: ["style-loader", "css-loader"],
+	},
+	{
 		test: /\.style.css$/,
 		use: [
 			"style-loader",
@@ -26,7 +30,7 @@ module.exports = [
 		],
 	},
 	{
-		test: /\.(png|jpg|gif|svg|jpeg)$/,
+		test: /\.(png|jpg|gif|svg|jpeg|ttf|woff(|2)|eot)$/,
 		loader: "file-loader",
 		options: {
 			name: "[name].[ext]",

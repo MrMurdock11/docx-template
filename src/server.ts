@@ -80,7 +80,7 @@ app.post("/api/generate", (req, res) => {
 					"Астахов Сергей Михайлович",
 					"genitive"
 				),
-				initials: "Мамбетов О.А.",
+				initials: "Астахов С.М.",
 				address: "г. Москва, ул. Пушкина 99",
 				phone: "8-966-323-12-01",
 				email: "Ryley_Mayert@example.org",
