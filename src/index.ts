@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import "dotenv-flow/config";
 import chalk from "chalk";
 import server from "./server";
 import internalIp from "internal-ip";

@@ -1,6 +1,3 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-import "dotenv-flow/config";
 import express, { urlencoded, json } from "express";
 import cors from "cors";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
@@ -22,7 +19,7 @@ app.use(urlencoded({ extended: false }));
 app.use(json());
 
 app.get("/", (_, res) => {
-	res.send("Осман ЛОХ!");
+	res.send("Home page!");
 });
 
 const inclineFullName = (
